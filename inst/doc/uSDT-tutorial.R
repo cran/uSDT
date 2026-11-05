@@ -23,7 +23,7 @@ if (!isTRUE(l10n_info()[["UTF-8"]])) {
     if (isTRUE(l10n_info()[["UTF-8"]])) break
   }
   # Windows accepts locale names it does not actually have, so trust
-  # l10n_info() rather than the return value, and undo the attempts when none
+  # l10n_info() to verify the locale, and undo the attempts when none
   # of the names produced a UTF-8 session.
   if (!isTRUE(l10n_info()[["UTF-8"]])) {
     invisible(suppressWarnings(Sys.setlocale("LC_CTYPE", old_ctype)))
@@ -41,57 +41,44 @@ head(vadillo_cuing)
 
 ## -----------------------------------------------------------------------------
 data_usdt <- usdt_data_tasks(
-  # One data frame per task
-  direct   = vadillo_awareness,
-  indirect = vadillo_cuing,
-
-  # Shared subject column
-  subject_col = "subj",
-
-  # Condition mapping (shared column name and labels here)
+  awareness = vadillo_awareness,
+  influence = vadillo_cuing,
+  subject_col      = "subj",
   condition_col    = "condition",
   condition_levels = c(signal = "old", noise = "new"),
-
-  # Response columns differ: judgements vs continuous response times
-  response_col = list(direct = "judged.old", indirect = "rt"),
-
-  # How responses map to signal vs noise
-  response_levels = list(
-    direct   = c(signal = 1, noise = 0),
-    indirect = c(signal = "faster", noise = "slower")
+  response_col     = list(awareness = "judged.old", influence = "rt"),
+  response_levels  = list(
+    awareness = c(signal = 1, noise = 0),
+    influence = c(signal = "faster", noise = "slower")
   ),
-
-  # Dichotomize continuous response times using a median split
-  dichotomize = list(direct = FALSE, indirect = TRUE),
-  
-  # Contrast coding scheme across conditions (deviation by-default)
-  coding = "deviation"
+  dichotomize = list(awareness = FALSE, influence = TRUE)
 )
 
 ## -----------------------------------------------------------------------------
 data_usdt
 
 ## -----------------------------------------------------------------------------
-# Fit hierarchical SDT model
 fit_uSDT <- hsdt(data_usdt)
-
-# Check model results
 summary(fit_uSDT)
 
 ## -----------------------------------------------------------------------------
-# Small helpers so the prose below quotes the fit rather than repeating it.
-h   <- function(term) fit_uSDT$tests[match(term, fit_uSDT$tests$term), ]
+h <- function(term) fit_uSDT$tests[match(term, fit_uSDT$tests$term), ]
 fmt <- function(x, digits = 2) formatC(x, format = "f", digits = digits)
-ci  <- function(term, digits = 2) {
+ci <- function(term) {
   r <- h(term)
-  sprintf("[%s, %s]", fmt(r$conf.low, digits), fmt(r$conf.high, digits))
+  sprintf("[%s, %s]", fmt(r$conf.low), fmt(r$conf.high))
 }
 
 ## -----------------------------------------------------------------------------
-usdt_reliability(fit_uSDT)
+usdt_equivalence(fit_uSDT, c("diff in [-0.2, 0.2]", "intercept < 0.2",
+                            "rho in [-0.3, 0.3]"))
 
 ## -----------------------------------------------------------------------------
-print(head(usdt_reliability(fit_uSDT)$subjects), digits = 3)
+reliability <- usdt_reliability(fit_uSDT)
+reliability
+
+## -----------------------------------------------------------------------------
+head(reliability$subjects)
 
 ## -----------------------------------------------------------------------------
 plot(fit_uSDT)
@@ -109,7 +96,7 @@ plot(fit_uSDT, type = "roc")
 plot(fit_uSDT, type = "roc", subject_id = 2040)
 
 ## -----------------------------------------------------------------------------
-# fit_boot <- usdt_boot(fit_uSDT, nsim = 1000, ncores = 4, seed = 2026)
+# fit_boot <- usdt_boot(fit_uSDT, nsim = 1000, ncores = 2, seed = 2026)
 # summary(fit_boot)
 # fit_boot$tests
 

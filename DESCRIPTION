@@ -2,7 +2,7 @@ Package: uSDT
 Type: Package
 Title: Hierarchical Signal Detection Theory Models for Unconscious
         Processing
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Ricardo", "Rey-Sáez",
            email   = "ricardoreysaez95@gmail.com",
@@ -21,32 +21,31 @@ Authors@R: c(
            role    = "aut",
            comment = c(ORCID = "0000-0001-8421-816X")))
 Description: Fits hierarchical signal detection theory (SDT) models to paired
-    direct and indirect measures, the design used to test for unconscious
-    processing. Continuous indirect measures (typically response times) are
-    dichotomized with the within-subject median split of Meyen et al. (2022)
-    <doi:10.1037/xge0001065> so that both tasks are placed on a common
-    sensitivity scale. The package estimates a binomial probit mixed model in
-    which the two sensitivities are correlated random effects, and tests the
-    three hypotheses of interest: the group-level difference between
-    sensitivities, their latent correlation, and the latent regression of the
-    indirect on the direct measure, whose intercept is the test for
-    unconscious processing. Frequentist estimation uses 'lme4'.
+    awareness and influence measures in research on unconscious processing.
+    Estimates mean sensitivities, their latent correlation and influence
+    sensitivity at zero awareness sensitivity, using maximum likelihood with
+    'lme4' or Bayesian inference with 'brms'. Provides Bayes factors, equivalence
+    tests, reliability estimates and study planning for power, precision and cost.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Depends: R (>= 4.1)
-Imports: stats, utils, lme4, ggplot2, rlang
-Suggests: testthat (>= 3.0.0), knitr, rmarkdown
+Imports: grid, parallel, stats, utils, lme4, ggplot2, gtable, rlang,
+        brms, posterior, logspline, callr, cli, withr (>= 3.0.3)
+Suggests: testthat (>= 3.1.7), knitr, rmarkdown, BH, RcppEigen,
+        cmdstanr
+Additional_repositories: https://stan-dev.r-universe.dev
+SystemRequirements: C++17 compiler (for Bayesian model compilation)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/Needs/website: pkgdown
 URL: https://github.com/RicardoReySaez/uSDT,
         https://ricardoreysaez.github.io/uSDT/
 BugReports: https://github.com/RicardoReySaez/uSDT/issues
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
 NeedsCompilation: no
-Packaged: 2026-09-18 17:31:16 UTC; 34653
+Packaged: 2026-11-05 17:03:00 UTC; runner
 Author: Ricardo Rey-Sáez [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-6739-2035>),
   Francisco Garre-Frutos [aut] (ORCID:
@@ -56,4 +55,4 @@ Author: Ricardo Rey-Sáez [aut, cre] (ORCID:
   Miguel Vadillo [aut] (ORCID: <https://orcid.org/0000-0001-8421-816X>)
 Maintainer: Ricardo Rey-Sáez <ricardoreysaez95@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-09-29 13:40:02 UTC
+Date/Publication: 2026-11-05 20:30:02 UTC

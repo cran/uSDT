@@ -1,7 +1,7 @@
 # design.R
 # This script builds the model formula and records its structure.
 # Author: Ricardo Rey-Sáez
-# Last modified: 04-09-2026
+# Last modified: 07-10-2026
 
 # Internal functions
 
@@ -15,10 +15,10 @@
 
   # The criterion settings select the criterion terms.
   czero <- d$meta$criterion_zero
-  keep  <- c(direct = TRUE, indirect = TRUE)
+  keep  <- c(awareness = TRUE, influence = TRUE)
   if (fix_criteria == "auto") keep <- !czero
-  crit  <- c("c_D", "c_I")[c(keep[["direct"]], keep[["indirect"]])]
-  slope <- c("d_D", "d_I")
+  crit  <- c("c_A", "c_I")[c(keep[["awareness"]], keep[["influence"]])]
+  slope <- c("d_A", "d_I")
 
   # Each model engine receives its expected response format.
   lhs <- if (response == "cbind") "cbind(y, n - y)" else "y | trials(n)"
@@ -41,23 +41,8 @@
       env = parent.frame()),
     criteria  = crit,
     slopes    = slope,
-    dropped   = c("c_D", "c_I")[!c(keep[["direct"]], keep[["indirect"]])],
+    dropped   = c("c_A", "c_I")[!c(keep[["awareness"]], keep[["influence"]])],
     n_fixed   = length(crit) + 2L,
     n_var     = nv
   )
-}
-
-# This function wraps a long formula for printed output.
-.formula_lines <- function(f, width = 74L) {
-  txt <- paste(deparse(f, width.cutoff = 500L), collapse = " ")
-  txt <- gsub("\\s+", " ", txt)
-  if (nchar(txt) <= width) return(txt)
-
-  # A long formula breaks before its first random term.
-  at <- regexpr(" + (0 +", txt, fixed = TRUE)
-  if (at < 0L) return(strwrap(txt, width))
-  head <- substr(txt, 1L, at + 1L)
-  tail <- substr(txt, at + 3L, nchar(txt))
-  pad  <- strrep(" ", regexpr("~", head, fixed = TRUE) + 1L)
-  c(head, paste0(pad, tail))
 }
